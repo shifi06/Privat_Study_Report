@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Daftar Akun Baru - Sistem Report Belajar{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center py-8">
+
+    <!-- Kartu Registrasi Utama -->
+    <div class="bg-white w-full max-w-5xl min-h-[650px] rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-gray-100">
+        
+        <!-- Bagian Kiri: Form Registrasi -->
+        <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
+            
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Buat Akun Baru</h1>
+                <p class="text-gray-500 text-sm">Bergabunglah untuk memantau perkembangan belajar dengan lebih baik.</p>
+            </div>
+
+            <form method="POST" class="space-y-5">
+                <!-- Input Nama Lengkap -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" name="nama" required 
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition text-sm" 
+                               placeholder="Contoh: Budi Santoso">
+                    </div>
+                </div>
+
+                <!-- Input Email -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input type="email" name="email" required 
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition text-sm" 
+                               placeholder="nama@email.com">
+                    </div>
+                </div>
+                
+                <!-- Input Password -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" name="password" required 
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition text-sm" 
+                               placeholder="••••••••">
+                    </div>
+                </div>
+
+                <!-- Pilihan Role -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Daftar Sebagai</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Pilihan Guru -->
+                        <label class="cursor-pointer group relative">
+                            <input type="radio" name="role" value="guru" class="peer sr-only" checked>
+                            <div class="p-4 border-2 border-gray-200 rounded-xl text-center hover:border-gray-400 transition peer-checked:border-black peer-checked:bg-gray-50">
+                                <i class="fas fa-chalkboard-teacher text-2xl mb-2 text-gray-600 peer-checked:text-black"></i>
+                                <div class="text-sm font-bold text-gray-700 peer-checked:text-black">Guru</div>
+                            </div>
+                            <div class="absolute top-2 right-2 text-black opacity-0 peer-checked:opacity-100 transition">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </label>
+                        
+                        <!-- Pilihan Orang Tua -->
+                        <label class="cursor-pointer group relative">
+                            <input type="radio" name="role" value="orangtua" class="peer sr-only">
+                            <div class="p-4 border-2 border-gray-200 rounded-xl text-center hover:border-gray-400 transition peer-checked:border-black peer-checked:bg-gray-50">
+                                <i class="fas fa-user-friends text-2xl mb-2 text-gray-600 peer-checked:text-black"></i>
+                                <div class="text-sm font-bold text-gray-700 peer-checked:text-black">Orang Tua</div>
+                            </div>
+                            <div class="absolute top-2 right-2 text-black opacity-0 peer-checked:opacity-100 transition">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Tombol Daftar -->
+                <button type="submit" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3.5 rounded-xl transition duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 mt-4 flex justify-center items-center gap-2">
+                    <span>Buat Akun</span>
+                    <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </form>
+            
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-500">
+                    Sudah punya akun? 
+                    <a href="{{ url_for('auth.login') }}" class="text-black font-bold hover:underline transition">Masuk di sini</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Bagian Kanan: Gambar Ilustrasi -->
+        <div class="hidden md:block w-1/2 relative">
+            <!-- Gambar Latar Belakang -->
+            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop" 
+                 alt="Friends Learning" 
+                 class="absolute inset-0 w-full h-full object-cover">
+            
+            <!-- Overlay Gradient Hitam Transparan -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+
+            <!-- Konten Text di atas Gambar -->
+            <div class="absolute bottom-0 left-0 p-12 text-white z-10">
+                <div class="mb-4">
+                    <i class="fas fa-quote-left text-4xl text-white/30"></i>
+                </div>
+                <blockquote class="text-2xl font-light leading-relaxed mb-4">
+                    "Pendidikan adalah senjata paling mematikan di dunia, karena dengan pendidikan, Anda dapat mengubah dunia."
+                </blockquote>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-1 bg-white rounded-full"></div>
+                    <span class="font-bold uppercase tracking-widest text-sm">Nelson Mandela</span>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+</div>
+{% endblock %}

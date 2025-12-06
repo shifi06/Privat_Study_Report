@@ -1,0 +1,80 @@
+{
+  "users": {
+    "u1": {
+      "id": "u1",
+      "nama": "Administrator",
+      "email": "admin@sekolah.com",
+      "password": "admin123",
+      "role": "admin"
+    },
+    "u2": {
+      "id": "u2",
+      "nama": "Ibu Guru Siti",
+      "email": "guru@sekolah.com",
+      "password": "guru123",
+      "role": "guru"
+    },
+    "u3": {
+      "id": "u3",
+      "nama": "Pak Budi (Ortu Andi)",
+      "email": "ortu@sekolah.com",
+      "password": "ortu123",
+      "role": "orangtua",
+      "student_id": "s1"
+    },
+    "u4": {
+      "id": "u4",
+      "nama": "Pak Anton (Ortu Siti)",
+      "email": "ortu1@sekolah.com",
+      "password": "ortu123",
+      "role": "orangtua",
+      "student_id": "s2"
+    }
+  },
+  "students": {
+    "s1": {
+      "id": "s1",
+      "nama": "Andi Pratama",
+      "kelas": "5 SD",
+      "orangtua_id": "u3"
+    },
+    "s2": {
+      "id": "s2",
+      "nama": "Siti Aminah",
+      "kelas": "3 SD",
+      "orangtua_id": null
+    }
+  },
+  "reports": {
+    "r1": {
+      "id": "r1",
+      "student_id": "s1",
+      "guru_id": "u2",
+      "tanggal": "2025-11-20",
+      "mata_pelajaran": "Matematika",
+      "materi": "Pecahan Campuran",
+      "nilai": 85,
+      "catatan": "Andi sudah paham konsep dasar, perlu teliti saat menjumlahkan."
+    },
+    "r2": {
+      "id": "r2",
+      "student_id": "s1",
+      "guru_id": "u2",
+      "tanggal": "2025-11-22",
+      "mata_pelajaran": "Bahasa Inggris",
+      "materi": "Simple Present Tense",
+      "nilai": 90,
+      "catatan": "Pelafalan (pronunciation) sangat bagus."
+    },
+    "r47d4fb64": {
+      "id": "r47d4fb64",
+      "guru_id": "u2",
+      "student_id": "s2",
+      "tanggal": "2025-11-21",
+      "mata_pelajaran": "Cryptografi",
+      "materi": "Theorema Wilson",
+      "nilai": 100,
+      "catatan": "sangat baik"
+    }
+  }
+}

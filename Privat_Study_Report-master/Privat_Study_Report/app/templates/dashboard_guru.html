@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Container utama -->
+<div class="space-y-8">
+    
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard Guru</h1>
+            <p class="text-gray-500 mt-1">Selamat datang kembali, {{ current_user.nama }}!</p>
+        </div>
+        <!-- Tombol Trigger Modal -->
+        <button onclick="toggleModal('reportModal')" class="bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition flex items-center gap-2">
+            <i class="fas fa-plus"></i>
+            Buat Laporan Baru
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Card 1 -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Total Siswa</p>
+                <h3 class="text-2xl font-bold text-gray-900">{{ students|length }}</h3>
+            </div>
+        </div>
+        
+        <!-- Card 2 -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Total Laporan</p>
+                <h3 class="text-2xl font-bold text-gray-900">{{ reports|length }}</h3>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Status Akun</p>
+                <h3 class="text-2xl font-bold text-gray-900">Aktif</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900">Riwayat Laporan Mengajar</h2>
+            <div class="flex gap-2">
+                <button class="p-2 text-gray-400 hover:text-gray-600 transition"><i class="fas fa-filter"></i></button>
+                <button class="p-2 text-gray-400 hover:text-gray-600 transition"><i class="fas fa-download"></i></button>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold tracking-wider">
+                    <tr>
+                        <th class="px-6 py-4">Siswa</th>
+                        <th class="px-6 py-4">Mata Pelajaran</th>
+                        <th class="px-6 py-4">Materi</th>
+                        <th class="px-6 py-4">Nilai</th>
+                        <th class="px-6 py-4">Tanggal</th>
+                        <th class="px-6 py-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for r in reports %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                                    {{ r.nama_siswa[0] }}
+                                </div>
+                                <span class="font-medium text-gray-900">{{ r.nama_siswa }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">{{ r.mata_pelajaran }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ r.materi }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold 
+                                {{ 'bg-green-50 text-green-700' if r.nilai >= 80 else 'bg-yellow-50 text-yellow-700' }}">
+                                {{ r.nilai }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-gray-500 text-sm">{{ r.tanggal }}</td>
+                        <td class="px-6 py-4">
+                            <span class="text-green-600 text-sm font-medium flex items-center gap-1">
+                                <i class="fas fa-check"></i> Terkirim
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                            Belum ada laporan yang dibuat.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Form (Hidden by default) -->
+<div id="reportModal" class="fixed inset-0 z-50 hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="toggleModal('reportModal')"></div>
+    
+    <!-- Modal Content -->
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all scale-100 overflow-hidden animate-fade-in-up">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-900">Input Laporan Baru</h3>
+                <button onclick="toggleModal('reportModal')" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="p-6 max-h-[80vh] overflow-y-auto">
+                <form method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Siswa</label>
+                        <select name="student_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" required>
+                            <option value="">-- Pilih Siswa --</option>
+                            {% for s in students %}
+                            <option value="{{ s.id }}">{{ s.nama }} - {{ s.kelas }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" name="tanggal" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nilai (0-100)</label>
+                            <input type="number" name="nilai" min="0" max="100" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
+                        <input type="text" name="mapel" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" placeholder="Contoh: Matematika" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Materi Pembelajaran</label>
+                        <input type="text" name="materi" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" placeholder="Contoh: Aljabar Dasar" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                        <textarea name="catatan" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" placeholder="Catatan perkembangan siswa..."></textarea>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-lg transition shadow-md">
+                            Simpan Laporan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+        } else {
+            modal.classList.add('hidden');
+        }
+    }
+</script>
+
+{% endblock %}
