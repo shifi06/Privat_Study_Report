@@ -1,6 +1,6 @@
 import json
 import os
-
+import uuid
 class JsonRepository:
     """Data Access Layer: Menangani interaksi langsung dengan file JSON"""
     
@@ -74,23 +74,55 @@ class JsonRepository:
 
     # --- Reports ---
     def add_report(self, report_data):
+        """Menambah laporan baru dengan generate ID unik otomatis"""
         data = self._read_db()
         if 'reports' not in data:
             data['reports'] = {}
+        
+        # Jika ID tidak dikirim dari service, buat ID unik baru
+        if 'id' not in report_data or not report_data['id']:
+            report_data['id'] = str(uuid.uuid4())[:8]
+            
         data['reports'][report_data['id']] = report_data
         self._write_db(data)
         return report_data
 
-    def get_reports_by_student(self, student_id):
-        data = self._read_db()
-        reports = []
-        # Pastikan 'reports' ada
-        all_reports = data.get('reports', {})
-        for r in all_reports.values():
-            if r.get('student_id') == student_id:
-                reports.append(r)
-        return sorted(reports, key=lambda x: x.get('tanggal', ''), reverse=True)
-
     def get_all_reports(self):
         data = self._read_db()
         return list(data.get('reports', {}).values())
+
+    def update_report(self, report_id, updated_data):
+        """Memperbarui laporan berdasarkan report_id"""
+        data = self._read_db()
+        
+        if 'reports' in data and report_id in data['reports']:
+            # Gunakan .update() untuk memperbarui dictionary secara efisien
+            data['reports'][report_id].update(updated_data)
+            self._write_db(data)
+            return True
+        return False
+
+    def delete_report(self, report_id):
+        """
+        BARU: Menghapus laporan berdasarkan ID.
+        Fungsi ini akan dipanggil oleh routes.py
+        """
+        data = self._read_db()
+        
+        # Pastikan report_id dikonversi ke string karena JSON key selalu string
+        report_id = str(report_id)
+        
+        if 'reports' in data and report_id in data['reports']:
+            # Menghapus key dari dictionary
+            del data['reports'][report_id]
+            self._write_db(data)
+            return True
+            
+        return False
+    
+    # Tambahkan ini di class JsonRepository
+def get_students_by_parent(self, parent_id):
+    data = self._read_db()
+    students = data.get('students', {})
+    # Ambil semua siswa yang punya orangtua_id cocok
+    return [s for s in students.values() if s.get('orangtua_id') == parent_id]

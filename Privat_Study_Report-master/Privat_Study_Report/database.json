@@ -1,80 +1,84 @@
 {
   "users": {
-    "u1": {
-      "id": "u1",
-      "nama": "Administrator",
-      "email": "admin@sekolah.com",
-      "password": "admin123",
-      "role": "admin"
+    "u12345": {
+        "id": "u12345",
+        "nama": "Administrator",
+        "email": "admin@gmail.com",
+        "password": "123456", 
+        "role": "admin"
     },
-    "u2": {
-      "id": "u2",
-      "nama": "Ibu Guru Siti",
-      "email": "guru@sekolah.com",
-      "password": "guru123",
-      "role": "guru"
+    "u71e6bc0b": {
+      "id": "u71e6bc0b",
+      "nama": "Azmi Ittaqi Hammami ",
+      "email": "azmttqi@gmail.com",
+      "password": "azmttqi3",
+      "role": "guru",
+      "student_id": null
     },
-    "u3": {
-      "id": "u3",
-      "nama": "Pak Budi (Ortu Andi)",
-      "email": "ortu@sekolah.com",
-      "password": "ortu123",
+    "uda16a479": {
+      "id": "uda16a479",
+      "nama": "Shifi ",
+      "email": "shifi@gmail.com",
+      "password": "123456",
       "role": "orangtua",
-      "student_id": "s1"
+      "student_id": null
     },
-    "u4": {
-      "id": "u4",
-      "nama": "Pak Anton (Ortu Siti)",
-      "email": "ortu1@sekolah.com",
-      "password": "ortu123",
+    "ubf08f2c2": {
+      "id": "ubf08f2c2",
+      "nama": "jack",
+      "email": "jack@email.com",
+      "password": "jack11",
+      "role": "guru",
+      "student_id": null
+    },
+    "u0bb3e12b": {
+      "id": "u0bb3e12b",
+      "nama": "adel ",
+      "email": "adel@gmail.com",
+      "password": "adel22",
       "role": "orangtua",
-      "student_id": "s2"
+      "student_id": null
     }
   },
   "students": {
-    "s1": {
-      "id": "s1",
-      "nama": "Andi Pratama",
-      "kelas": "5 SD",
-      "orangtua_id": "u3"
+    "sb3e41a7d": {
+      "id": "sb3e41a7d",
+      "nama": "Nabil Thoriq",
+      "kelas": "12 MIPA",
+      "parent_id": "uda16a479",
+      "teacher_id": "u71e6bc0b"
     },
-    "s2": {
-      "id": "s2",
-      "nama": "Siti Aminah",
-      "kelas": "3 SD",
-      "orangtua_id": null
+    "s92c6d737": {
+      "id": "s92c6d737",
+      "nama": "Nayla Elrazqya",
+      "kelas": "12 MIPA",
+      "parent_id": "uda16a479",
+      "teacher_id": "u71e6bc0b"
+    },
+    "s75c28cd3": {
+      "id": "s75c28cd3",
+      "nama": "farhan ",
+      "kelas": "9",
+      "parent_id": "u0bb3e12b",
+      "teacher_id": "ubf08f2c2"
+    },
+    "s6d7d0513": {
+      "id": "s6d7d0513",
+      "nama": "farhan ",
+      "kelas": "9",
+      "parent_id": "u0bb3e12b",
+      "teacher_id": "ubf08f2c2"
     }
   },
   "reports": {
-    "r1": {
-      "id": "r1",
-      "student_id": "s1",
-      "guru_id": "u2",
-      "tanggal": "2025-11-20",
+    "d909f2be": {
+      "student_id": "s75c28cd3",
+      "tanggal": "2025-12-19",
+      "nilai": "50",
       "mata_pelajaran": "Matematika",
       "materi": "Pecahan Campuran",
-      "nilai": 85,
-      "catatan": "Andi sudah paham konsep dasar, perlu teliti saat menjumlahkan."
-    },
-    "r2": {
-      "id": "r2",
-      "student_id": "s1",
-      "guru_id": "u2",
-      "tanggal": "2025-11-22",
-      "mata_pelajaran": "Bahasa Inggris",
-      "materi": "Simple Present Tense",
-      "nilai": 90,
-      "catatan": "Pelafalan (pronunciation) sangat bagus."
-    },
-    "r47d4fb64": {
-      "id": "r47d4fb64",
-      "guru_id": "u2",
-      "student_id": "s2",
-      "tanggal": "2025-11-21",
-      "mata_pelajaran": "Cryptografi",
-      "materi": "Theorema Wilson",
-      "nilai": 100,
-      "catatan": "sangat baik"
+      "catatan": "vyrugyyf75",
+      "id": "d909f2be"
     }
   }
 }

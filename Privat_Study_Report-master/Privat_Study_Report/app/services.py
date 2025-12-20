@@ -30,7 +30,7 @@ class ReportService:
         self.repo.add_report(report_data)
         return True, "Laporan berhasil dibuat"
 
-    def create_student(self, nama, kelas):
+    def create_student(self, nama, kelas, orangtua_id=None):
         if not nama or not kelas:
             return False, "Nama dan Kelas harus diisi"
         
@@ -39,7 +39,7 @@ class ReportService:
             "id": student_id,
             "nama": nama,
             "kelas": kelas,
-            "orangtua_id": None
+            "orangtua_id": orangtua_id # Link ke orang tua di sini
         }
         self.repo.add_student(student_data)
         return True, "Berhasil menambahkan siswa baru"
@@ -109,3 +109,39 @@ class ReportService:
             "average_score": round(avg_score, 1),
             "total_reports": len(reports)
         }
+
+# services.py
+
+    def update_report(self, report_id, student_id, mata_pelajaran, materi, nilai, catatan, tanggal):
+        """
+        Memproses permintaan update laporan dengan validasi.
+        """
+        # 1. Validasi Input
+        if not report_id or not student_id or not nilai:
+            return False, "Data tidak lengkap. ID Laporan, Siswa, dan Nilai wajib diisi."
+
+        try:
+            nilai_int = int(nilai)
+            if not (0 <= nilai_int <= 100):
+                return False, "Nilai harus antara 0 sampai 100."
+        except ValueError:
+            return False, "Format nilai tidak valid."
+
+        # 2. Siapkan data baru
+        updated_data = {
+            'student_id': student_id,
+            'mata_pelajaran': mata_pelajaran,
+            'materi': materi,
+            'nilai': nilai_int,
+            'catatan': catatan,
+            'tanggal': tanggal
+        }
+
+        # 3. Panggil fungsi update di repository
+        # Pastikan report_id dikirim dengan benar (misal: 'r123456')
+        success = self.repo.update_report(report_id, updated_data)
+
+        if success:
+            return True, "Laporan berhasil diperbarui."
+        else:
+            return False, "Gagal memperbarui: ID Laporan tidak ditemukan di database."

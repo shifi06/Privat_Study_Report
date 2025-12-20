@@ -1,36 +1,44 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Container utama -->
 <div class="space-y-8">
     
-    <!-- Header Section -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="p-4 rounded-xl {% if category == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} flex justify-between items-center shadow-sm">
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()" class="text-sm font-bold">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Dashboard Guru</h1>
             <p class="text-gray-500 mt-1">Selamat datang kembali, {{ current_user.nama }}!</p>
         </div>
-        <!-- Tombol Trigger Modal -->
         <button onclick="toggleModal('reportModal')" class="bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition flex items-center gap-2">
             <i class="fas fa-plus"></i>
             Buat Laporan Baru
         </button>
     </div>
 
-    <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Card 1 -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+        <div onclick="toggleModal('studentListModal')" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:bg-blue-50/50 transition-all group">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
                 <i class="fas fa-user-graduate"></i>
             </div>
             <div>
                 <p class="text-sm text-gray-500 font-medium">Total Siswa</p>
                 <h3 class="text-2xl font-bold text-gray-900">{{ students|length }}</h3>
             </div>
+            <div class="ml-auto text-gray-300 group-hover:text-blue-600 transition-colors">
+                <i class="fas fa-chevron-right"></i>
+            </div>
         </div>
         
-        <!-- Card 2 -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl">
                 <i class="fas fa-file-alt"></i>
@@ -41,7 +49,6 @@
             </div>
         </div>
 
-        <!-- Card 3 -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl">
                 <i class="fas fa-check-circle"></i>
@@ -53,13 +60,43 @@
         </div>
     </div>
 
-    <!-- Table Section -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div class="p-6 border-b border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <h2 class="text-xl font-bold text-gray-900">Riwayat Laporan Mengajar</h2>
-            <div class="flex gap-2">
-                <button class="p-2 text-gray-400 hover:text-gray-600 transition"><i class="fas fa-filter"></i></button>
-                <button class="p-2 text-gray-400 hover:text-gray-600 transition"><i class="fas fa-download"></i></button>
+            
+            <div class="flex flex-wrap items-center gap-3">
+                <select id="filterMapel" onchange="searchTable()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none bg-white cursor-pointer">
+                    <option value="">Semua Mapel</option>
+                    {% for m in daftar_mapel %}
+                    <option value="{{ m }}">{{ m }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="flex items-center gap-1">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                            <i class="fas fa-search text-sm"></i>
+                        </span>
+                        <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Cari nama siswa..." 
+                            class="pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none w-full sm:w-64">
+                    </div>
+
+                    <div class="relative flex items-center">
+                        <button onclick="document.getElementById('filterTanggal').showPicker()" class="p-2 text-gray-400 hover:text-black transition-colors" title="Filter Tanggal">
+                            <i class="fas fa-calendar-alt text-lg"></i>
+                        </button>
+                        <input type="date" id="filterTanggal" onchange="updateDateFilter(this)" class="absolute opacity-0 pointer-events-none w-0">
+                    </div>
+                    
+                    <button id="btnReset" onclick="resetFilters()" class="hidden p-2 text-red-500 hover:text-red-700 transition" title="Hapus Filter">
+                        <i class="fas fa-times-circle text-lg"></i>
+                    </button>
+                </div>
+                
+                <a href="/export-reports" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-medium transition" title="Download Excel">
+                    <i class="fas fa-download"></i>
+                    Export
+                </a>
             </div>
         </div>
         
@@ -70,9 +107,9 @@
                         <th class="px-6 py-4">Siswa</th>
                         <th class="px-6 py-4">Mata Pelajaran</th>
                         <th class="px-6 py-4">Materi</th>
-                        <th class="px-6 py-4">Nilai</th>
+                        <th class="px-6 py-4 text-center">Nilai</th>
                         <th class="px-6 py-4">Tanggal</th>
-                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -80,31 +117,44 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
-                                    {{ r.nama_siswa[0] }}
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-600">
+                                    {{ r.nama_siswa[0] if r.nama_siswa else '?' }}
                                 </div>
                                 <span class="font-medium text-gray-900">{{ r.nama_siswa }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-gray-600">{{ r.mata_pelajaran }}</td>
-                        <td class="px-6 py-4 text-gray-600">{{ r.materi }}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold 
-                                {{ 'bg-green-50 text-green-700' if r.nilai >= 80 else 'bg-yellow-50 text-yellow-700' }}">
+                        <td class="px-6 py-4 text-gray-600 text-sm">{{ r.mata_pelajaran }}</td>
+                        <td class="px-6 py-4 text-gray-600 text-sm truncate max-w-[200px]" title="{{ r.materi }}">{{ r.materi }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold 
+                                {{ 'bg-green-100 text-green-700' if r.nilai|int >= 80 else 'bg-yellow-100 text-yellow-700' }}">
                                 {{ r.nilai }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-gray-500 text-sm">{{ r.tanggal }}</td>
+                        <td class="px-6 py-4 text-gray-500 text-sm whitespace-nowrap">{{ r.tanggal }}</td>
                         <td class="px-6 py-4">
-                            <span class="text-green-600 text-sm font-medium flex items-center gap-1">
-                                <i class="fas fa-check"></i> Terkirim
-                            </span>
+                            <div class="flex justify-center gap-2">
+                                <button onclick="openEditModal('{{ r.id }}', '{{ r.student_id }}', '{{ r.tanggal }}', '{{ r.nilai }}', '{{ r.mata_pelajaran }}', '{{ r.materi }}', '{{ r.catatan }}')" 
+                                        class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus laporan ini?');" class="inline">
+                                    <input type="hidden" name="action" value="delete_report">
+                                    <input type="hidden" name="report_id" value="{{ r.id }}">
+                                    <button type="submit" class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition" title="Hapus">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                            Belum ada laporan yang dibuat.
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-folder-open text-4xl mb-3 text-gray-300"></i>
+                                <p>Belum ada laporan yang tersedia.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -114,81 +164,164 @@
     </div>
 </div>
 
-<!-- Modal Form (Hidden by default) -->
-<div id="reportModal" class="fixed inset-0 z-50 hidden">
-    <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="toggleModal('reportModal')"></div>
-    
-    <!-- Modal Content -->
-    <div class="absolute inset-0 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all scale-100 overflow-hidden animate-fade-in-up">
-            <!-- Modal Header -->
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-                <h3 class="text-lg font-bold text-gray-900">Input Laporan Baru</h3>
-                <button onclick="toggleModal('reportModal')" class="text-gray-400 hover:text-gray-600 transition">
-                    <i class="fas fa-times"></i>
+<div id="studentListModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="toggleModal('studentListModal')"></div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all relative z-10 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-blue-50">
+                <h3 class="text-lg font-bold text-gray-900">Daftar Siswa Saya</h3>
+                <button onclick="toggleModal('studentListModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            
-            <!-- Modal Body -->
-            <div class="p-6 max-h-[80vh] overflow-y-auto">
-                <form method="POST" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Siswa</label>
-                        <select name="student_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" required>
-                            <option value="">-- Pilih Siswa --</option>
-                            {% for s in students %}
-                            <option value="{{ s.id }}">{{ s.nama }} - {{ s.kelas }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                            <input type="date" name="tanggal" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" required>
+            <div class="p-6">
+                <div class="max-h-96 overflow-y-auto space-y-3">
+                    {% for s in students %}
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-600">
+                                {{ s.nama[0] }}
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900 text-sm">{{ s.nama }}</p>
+                                <p class="text-xs text-gray-500">Kelas: {{ s.kelas }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nilai (0-100)</label>
-                            <input type="number" name="nilai" min="0" max="100" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" required>
-                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-white text-gray-400 border border-gray-200 rounded-md">
+                            Aktif
+                        </span>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
-                        <input type="text" name="mapel" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" placeholder="Contoh: Matematika" required>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Materi Pembelajaran</label>
-                        <input type="text" name="materi" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" placeholder="Contoh: Aljabar Dasar" required>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
-                        <textarea name="catatan" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition" placeholder="Catatan perkembangan siswa..."></textarea>
-                    </div>
-
-                    <div class="pt-4">
-                        <button type="submit" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-lg transition shadow-md">
-                            Simpan Laporan
-                        </button>
-                    </div>
-                </form>
+                    {% else %}
+                    <p class="text-center text-gray-500 text-sm py-4">Belum ada siswa yang terdaftar.</p>
+                    {% endfor %}
+                </div>
+                <button onclick="toggleModal('studentListModal')" class="w-full mt-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-black transition shadow-lg">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+{% set modals = [
+    {'id': 'reportModal', 'title': 'Input Laporan Baru', 'action': 'create_report', 'btn_color': 'bg-black'},
+    {'id': 'editModal', 'title': 'Edit Laporan Mengajar', 'action': 'edit_report', 'btn_color': 'bg-blue-600'}
+] %}
+
+{% for modal in modals %}
+<div id="{{ modal.id }}" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="toggleModal('{{ modal.id }}')"></div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all relative z-10 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between {% if modal.id == 'editModal' %}bg-blue-50{% else %}bg-gray-50{% endif %}">
+                <h3 class="text-lg font-bold text-gray-900">{{ modal.title }}</h3>
+                <button onclick="toggleModal('{{ modal.id }}')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form method="POST" class="p-6 space-y-4">
+                <input type="hidden" name="action" value="{{ modal.action }}">
+                {% if modal.id == 'editModal' %}<input type="hidden" name="report_id" id="edit_report_id">{% endif %}
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Siswa</label>
+                    <select name="student_id" id="{% if modal.id == 'editModal' %}edit_student_id{% endif %}" class="w-full px-4 py-2 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black" required>
+                        <option value="">-- Pilih Siswa --</option>
+                        {% for s in students %}<option value="{{ s.id }}">{{ s.nama }} - {{ s.kelas }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal</label>
+                        <input type="date" name="tanggal" id="{% if modal.id == 'editModal' %}edit_tanggal{% endif %}" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nilai</label>
+                        <input type="number" name="nilai" id="{% if modal.id == 'editModal' %}edit_nilai{% endif %}" min="0" max="100" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Mata Pelajaran</label>
+                    <select name="mapel" id="{% if modal.id == 'editModal' %}edit_mapel{% endif %}" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none" required>
+                        {% for m in daftar_mapel %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Materi</label>
+                    <input type="text" name="materi" id="{% if modal.id == 'editModal' %}edit_materi{% endif %}" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Catatan</label>
+                    <textarea name="catatan" id="{% if modal.id == 'editModal' %}edit_catatan{% endif %}" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="toggleModal('{{ modal.id }}')" class="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
+                    <button type="submit" class="flex-1 {{ modal.btn_color }} text-white font-semibold py-3 rounded-xl shadow-lg transition opacity-90 hover:opacity-100">Simpan Laporan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
 <script>
     function toggleModal(modalId) {
         const modal = document.getElementById(modalId);
-        if (modal.classList.contains('hidden')) {
-            modal.classList.remove('hidden');
+        modal.classList.toggle('hidden');
+        document.body.style.overflow = modal.classList.contains('hidden') ? 'auto' : 'hidden';
+    }
+
+    function openEditModal(id, studentId, tanggal, nilai, mapel, materi, catatan) {
+        document.getElementById('edit_report_id').value = id;
+        document.getElementById('edit_student_id').value = studentId;
+        document.getElementById('edit_tanggal').value = tanggal;
+        document.getElementById('edit_nilai').value = nilai;
+        document.getElementById('edit_mapel').value = mapel;
+        document.getElementById('edit_materi').value = materi;
+        document.getElementById('edit_catatan').value = catatan;
+        toggleModal('editModal');
+    }
+
+    function updateDateFilter(input) {
+        if (input.value) {
+            document.getElementById('btnReset').classList.remove('hidden');
         } else {
-            modal.classList.add('hidden');
+            document.getElementById('btnReset').classList.add('hidden');
         }
+        searchTable();
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterMapel').value = '';
+        document.getElementById('filterTanggal').value = '';
+        document.getElementById('btnReset').classList.add('hidden');
+        searchTable();
+    }
+
+    function searchTable() {
+        let inputNama = document.getElementById("searchInput").value.toUpperCase();
+        let inputMapel = document.getElementById("filterMapel").value.toUpperCase();
+        let inputTanggal = document.getElementById("filterTanggal").value; 
+        
+        let tr = document.querySelectorAll("tbody tr");
+
+        tr.forEach(row => {
+            let tdNama = row.querySelector("td:nth-child(1)");
+            let tdMapel = row.querySelector("td:nth-child(2)");
+            let tdTanggal = row.querySelector("td:nth-child(5)");
+            
+            if (tdNama && tdMapel && tdTanggal) {
+                let txtNama = (tdNama.textContent || tdNama.innerText).toUpperCase();
+                let txtMapel = (tdMapel.textContent || tdMapel.innerText).toUpperCase();
+                let txtTanggal = (tdTanggal.textContent || tdTanggal.innerText).trim();
+                
+                let namaMatch = txtNama.includes(inputNama);
+                let mapelMatch = (inputMapel === "" || txtMapel.includes(inputMapel));
+                let tanggalMatch = (inputTanggal === "" || txtTanggal === inputTanggal);
+
+                row.style.display = (namaMatch && mapelMatch && tanggalMatch) ? "" : "none";
+            }
+        });
     }
 </script>
-
 {% endblock %}
